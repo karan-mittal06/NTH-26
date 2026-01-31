@@ -135,8 +135,28 @@ export async function POST(request) {
 
         const now = new Date();
 
-        // Update user in PostgreSQL
-        await pool.query(
+        // Update user in PostgreSQL)
+        const result = await pool.query("SELECT curr_level FROM users WHERE id = $1", [id]);
+
+        if (result.rows.length === 0) {
+            return NextResponse.json({ message: "User not found" }, { status: 404 });
+        }
+
+        if(curr_level == result.rows[0].curr_level){
+            await pool.query(
+            `
+            UPDATE users
+            SET 
+                curr_level = $1, 
+                hint_taken = $2, 
+                curr_keys = $3, 
+                hidden = $4
+            WHERE id = $5
+            `,
+            [curr_level, hint_taken, curr_keys, hidden, id]
+        );
+        }else{
+            await pool.query(
             `
             UPDATE users
             SET 
@@ -149,6 +169,7 @@ export async function POST(request) {
             `,
             [curr_level, hint_taken, curr_keys, hidden, now, id]
         );
+        }
 
         // Fetch the updated user
         const updatedUser = await pool.query("SELECT * FROM users WHERE id = $1", [id]);
