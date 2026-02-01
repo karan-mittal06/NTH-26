@@ -81,6 +81,15 @@ export const createTables = async () => {
             );
         `);
 
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS backup_settings (
+                id SERIAL PRIMARY KEY,
+                enabled BOOLEAN DEFAULT FALSE,
+                interval_seconds INTEGER DEFAULT 3600,
+                last_backup TIMESTAMP WITH TIME ZONE
+            );
+        `);
+
         client.release();
         console.log("✅ Tables ensured.");
     } catch (err) {
