@@ -85,8 +85,8 @@ services:
         condition: service_started
       admin:
         condition: service_started
-      shutdown-nginx-certbot:
-        condition: service_completed_successfully
+      # shutdown-nginx-certbot:
+      #   condition: service_completed_successfully
     restart: always
 
 volumes:
