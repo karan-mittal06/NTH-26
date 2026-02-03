@@ -145,6 +145,18 @@ const Page = () => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ interval_seconds: backupInterval }),
         });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message);
+        setAutoBackupEnabled(true);
+        alert(`Auto-backup started with ${backupInterval}s interval`);
+      }
+    } catch (error) {
+      console.error("Auto-backup error:", error);
+      alert(error.message);
+    }
+    setBackupLoading(false);
+  };
+
   const connectDrive = async () => {
     try {
       const res = await fetch("/superusers-admin/api/drive-oauth/authorize");
