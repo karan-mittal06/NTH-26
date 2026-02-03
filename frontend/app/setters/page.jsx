@@ -7,7 +7,7 @@ import { FaInstagram, FaLinkedin, FaGithub } from 'react-icons/fa';
 const QuestionSetters = () => {
   const spiderVerseSetters = [
     {
-      name: "Sanyog Dilip Pakhale",
+      name: "Sanyog Pakhale",
       subtitle: "OG Spider • Mentor",
       badge: "SETTER",
       avatar: "/admin/sanyog.webp",
@@ -40,20 +40,20 @@ const QuestionSetters = () => {
       name: "Vivek Amrutkar",
       subtitle: "Leader • Guardian",
       badge: "SETTER",
-      avatar: "",
-      linkedin: '',
-      instagram: '',
-      github: '',
+      avatar: "/admin/vivek.webp",
+      linkedin: 'https://www.linkedin.com/in/vivekhimself/',
+      instagram: 'https://www.instagram.com/vivekhimself/',
+      github: 'https://github.com/kharnsagara',
       styleClass: 'style-3'
     },
     {
       name: "Sharva Marawar",
       subtitle: "Anarchist • Rebel",
       badge: "SETTER",
-      avatar: "",
-      linkedin: '',
-      instagram: '',
-      github: '',
+      avatar: "/admin/sharva.webp",
+      linkedin: 'https://www.linkedin.com/in/sharva-marawar-61bb36332?utm_source=share_via&utm_content=profile&utm_medium=member_android',
+      instagram: 'https://www.instagram.com/__sharva__?igsh=MXM4YmxlMnVtNDJ4Nw==',
+      github: 'https://github.com/vadapaavv',
       styleClass: 'style-3'
     }
   ];
