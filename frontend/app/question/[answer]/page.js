@@ -33,10 +33,12 @@ const QuestionPage = ({params})=>{
           return start_time
         } else {
           toast.error("Failed to fetch event start time.");
+          return null;
         }
       } catch (error) {
         console.error("Error fetching event start time:", error);
-        toast.error("An error occurred while fetching event start time.");
+        toast.error("Backend not connected or hunt hasn't begun yet.");
+        return null;
       }
     };
 
@@ -50,7 +52,15 @@ const QuestionPage = ({params})=>{
           initialized.current = true;
           setLoading(true);
     
-          const start = new Date(await fetchEventStartTime());
+          const startTime = await fetchEventStartTime();
+          
+          if (!startTime) {
+            toast.info("Hunt hasn't started yet!");
+            router.push("/");
+            return;
+          }
+          
+          const start = new Date(startTime);
           const currentTime = new Date();
     
           if (currentTime < start) {
@@ -61,6 +71,8 @@ const QuestionPage = ({params})=>{
           }
         } catch (error) {
           console.error("Error checking event time:", error);
+          toast.error("Unable to access hunt. Redirecting to home...");
+          router.push("/");
         } finally {
           setLoading(false);
         }
