@@ -15,6 +15,10 @@ const Page = () => {
   const [backupInterval, setBackupInterval] = useState(3600); // default 1 hour
   const [backupLoading, setBackupLoading] = useState(false);
 
+  // Google Drive OAuth state
+  const [driveStatus, setDriveStatus] = useState({ connected: false, loading: true });
+  const [message, setMessage] = useState(null);
+
   useEffect(() => {
     const getData = async () => {
       try {
@@ -62,8 +66,20 @@ const Page = () => {
       }
     };
 
+    const checkDriveStatus = async () => {
+      try {
+        const res = await fetch("/superusers-admin/api/drive-oauth/status");
+        const data = await res.json();
+        setDriveStatus({ ...data, loading: false });
+      } catch (error) {
+        console.error("Failed to check Drive status:", error);
+        setDriveStatus({ connected: false, loading: false });
+      }
+    };
+
     getData();
     getBackupSettings();
+    checkDriveStatus();
   }, []);
   
   const handleSubmit = async(e) => {
@@ -129,8 +145,76 @@ const Page = () => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ interval_seconds: backupInterval }),
         });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.message);
+  const connectDrive = async () => {
+    try {
+      const res = await fetch("/superusers-admin/api/drive-oauth/authorize");
+      const data = await res.json();
+      if (data.authUrl) {
+        window.location.href = data.authUrl;
+      }
+    } catch (error) {
+      console.error("Failed to initiate OAuth:", error);
+      setMessage({ type: "error", text: "Failed to connect to Google Drive" });
+    }
+  };
+
+  const disconnectDrive = async () => {
+    try {
+      await fetch("/superusers-admin/api/drive-oauth/revoke", { method: "DELETE" });
+      setMessage({ type: "success", text: "Google Drive disconnected" });
+      setDriveStatus({ connected: false, loading: false });
+    } catch (error) {
+      console.error("Failed to disconnect:", error);
+      setMessage({ type: "error", text: "Failed to disconnect" });
+    }
+  };
+
+  return (
+    <div className="flex flex-col px-4 justify-center items-center min-h-screen py-20 gap-12">
+      {/* Google Drive Connection Status */}
+      <div className="w-full max-w-md border rounded-lg p-6 bg-gray-900/50">
+        <h2 className="text-xl font-bold mb-4 text-center">Google Drive Backup</h2>
+        <div className="flex flex-col items-center gap-4">
+          <div className="flex items-center gap-3">
+            <span className="text-sm font-medium">Status:</span>
+            {driveStatus.loading ? (
+              <span className="text-gray-400">Checking...</span>
+            ) : driveStatus.connected ? (
+              <span className="text-green-500 font-semibold">✓ Connected</span>
+            ) : (
+              <span className="text-red-500 font-semibold">✗ Not Connected</span>
+            )}
+          </div>
+          <div className="flex gap-3">
+            {!driveStatus.connected ? (
+              <Button onClick={connectDrive} variant="default" size="sm">
+                Connect Google Drive
+              </Button>
+            ) : (
+              <Button onClick={disconnectDrive} variant="destructive" size="sm">
+                Disconnect
+              </Button>
+            )}
+          </div>
+          {message && (
+            <div
+              className={`text-sm px-3 py-2 rounded ${
+                message.type === "success"
+                  ? "bg-green-100 text-green-700"
+                  : "bg-red-100 text-red-700"
+              }`}
+            >
+              {message.text}
+            </div>
+          )}
+          {!driveStatus.connected && (
+            <p className="text-xs text-gray-400 text-center">
+              Connect your Google account to enable backups
+            </p>
+          )}
+        </div>
+      </div>
+
         setAutoBackupEnabled(true);
         alert(`Auto-backup started with ${backupInterval}s interval`);
       }
