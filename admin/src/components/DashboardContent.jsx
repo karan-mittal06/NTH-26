@@ -13,7 +13,7 @@ const DashboardContent = () => {
     setBackupLoading(true);
     setMessage(null);
     try {
-      const res = await fetch("/api/backup", {
+      const res = await fetch("/superusers-admin/api/backup", {
         method: "POST",
         headers: {
           "x-backup-token": process.env.NEXT_PUBLIC_BACKUP_TOKEN || "default-token",
@@ -37,7 +37,7 @@ const DashboardContent = () => {
 
   const fetchBackups = async () => {
     try {
-      const res = await fetch("/api/backup", {
+      const res = await fetch("/superusers-admin/api/backup", {
         headers: {
           "x-backup-token": process.env.NEXT_PUBLIC_BACKUP_TOKEN || "default-token",
         },
