@@ -5,31 +5,12 @@ import { Button } from "@/components/ui/button";
 
 const DashboardContent = () => {
   const [backupLoading, setBackupLoading] = useState(false);
-  const [backups, setBackups] = useState([]);
   const [message, setMessage] = useState(null);
-  const [showBackups, setShowBackups] = useState(false);
   const [autoBackupEnabled, setAutoBackupEnabled] = useState(false);
   const [autoBackupSecondsInput, setAutoBackupSecondsInput] = useState("600");
   const [autoBackupSaving, setAutoBackupSaving] = useState(false);
   const [autoBackupMessage, setAutoBackupMessage] = useState(null);
   const [autoBackupStatus, setAutoBackupStatus] = useState(null);
-
-  const fetchBackups = useCallback(async () => {
-    try {
-      const res = await fetch("/superusers-admin/api/backup", {
-        headers: {
-          "x-backup-token": process.env.NEXT_PUBLIC_BACKUP_TOKEN || "default-token",
-        },
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setBackups(data.backups || []);
-        setShowBackups(true);
-      }
-    } catch (error) {
-      console.error("Failed to fetch backups:", error);
-    }
-  }, []);
 
   const createBackup = useCallback(async () => {
     setBackupLoading(true);
@@ -45,7 +26,6 @@ const DashboardContent = () => {
       
       if (res.ok) {
         setMessage({ type: "success", text: `Backup created: ${data.file?.name}` });
-        if (showBackups) fetchBackups();
       } else {
         setMessage({ type: "error", text: data.message || "Backup failed" });
       }
@@ -55,7 +35,7 @@ const DashboardContent = () => {
     } finally {
       setBackupLoading(false);
     }
-  }, [fetchBackups, showBackups]);
+  }, []);
 
   const autoBackupSeconds = useMemo(() => Number(autoBackupSecondsInput), [autoBackupSecondsInput]);
   const autoBackupSecondsValid = Number.isFinite(autoBackupSeconds) && autoBackupSeconds >= 600;
@@ -132,8 +112,14 @@ const DashboardContent = () => {
           <Button onClick={createBackup} disabled={backupLoading} variant="default">
             {backupLoading ? "Creating Backup..." : "Create Backup"}
           </Button>
-          <Button onClick={fetchBackups} variant="outline">
-            View Backups
+          <Button asChild variant="outline">
+            <a
+              href={`https://github.com/${process.env.NEXT_PUBLIC_GITHUB_REPO || ""}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              View Backups
+            </a>
           </Button>
         </div>
 
@@ -215,30 +201,6 @@ const DashboardContent = () => {
           </div>
         )}
 
-        {showBackups && (
-          <div className="mt-6 w-full max-w-md">
-            <h3 className="text-lg font-semibold mb-3">Recent Backups (GitHub)</h3>
-            {backups.length === 0 ? (
-              <p className="text-gray-500">No backups found</p>
-            ) : (
-              <ul className="space-y-2">
-                {backups.slice(0, 10).map((backup) => (
-                  <li key={backup.sha} className="flex justify-between items-center p-2 bg-gray-100 dark:bg-gray-800 rounded">
-                    <span className="text-sm truncate">{backup.name}</span>
-                    <a
-                      href={backup.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-500 hover:underline text-sm"
-                    >
-                      View
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        )}
       </div>
     </div>
   );
