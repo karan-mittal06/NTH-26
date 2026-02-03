@@ -114,7 +114,7 @@ const DashboardContent = () => {
           </Button>
           <Button asChild variant="outline">
             <a
-              href={`https://github.com/${process.env.NEXT_PUBLIC_GITHUB_REPO || ""}`}
+              href={`https://github.com/${process.env.NEXT_PUBLIC_GITHUB_REPO || "nthbuddy123-cyber/NTH-26-Backup"}`}
               target="_blank"
               rel="noopener noreferrer"
             >
