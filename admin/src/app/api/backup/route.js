@@ -7,8 +7,8 @@ import { google } from "googleapis";
 import pool from "@/lib/db";
 
 const REQUIRED_ENVS = [
-  "GOOGLE_CLIENT_EMAIL",
-  "GOOGLE_PRIVATE_KEY",
+  "GOOGLE_OAUTH_CLIENT_ID",
+  "GOOGLE_OAUTH_CLIENT_SECRET",
   "GOOGLE_DRIVE_FOLDER_ID",
   "BACKUP_TOKEN",
 ];
@@ -20,17 +20,61 @@ const assertEnv = () => {
   }
 };
 
-const getDriveClient = () => {
-  const clientEmail = process.env.GOOGLE_CLIENT_EMAIL;
-  const privateKey = process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, "\n");
+const getOAuthTokens = async () => {
+  const result = await pool.query(
+    `SELECT access_token, refresh_token, expiry_date 
+     FROM drive_oauth_tokens 
+     ORDER BY id DESC 
+     LIMIT 1`
+  );
 
-  const auth = new google.auth.JWT({
-    email: clientEmail,
-    key: privateKey,
-    scopes: ["https://www.googleapis.com/auth/drive.file"],
-  });
+  if (result.rows.length === 0) {
+    throw new Error("No OAuth tokens found. Please connect Google Drive first.");
+  }
 
-  return google.drive({ version: "v3", auth });
+  return result.rows[0];
+};
+
+const refreshAccessToken = async (oauth2Client, refreshToken) => {
+  oauth2Client.setCredentials({ refresh_token: refreshToken });
+  const { credentials } = await oauth2Client.refreshAccessToken();
+  
+  // Update tokens in database
+  await pool.query(
+    `UPDATE drive_oauth_tokens 
+     SET access_token = $1, expiry_date = $2, updated_at = NOW() 
+     WHERE id = 1`,
+    [credentials.access_token, credentials.expiry_date]
+  );
+
+  return credentials;
+};
+
+const getDriveClient = async () => {
+  const oauth2Client = new google.auth.OAuth2(
+    process.env.GOOGLE_OAUTH_CLIENT_ID,
+    process.env.GOOGLE_OAUTH_CLIENT_SECRET,
+    process.env.GOOGLE_OAUTH_REDIRECT_URI
+  );
+
+  const tokens = await getOAuthTokens();
+  
+  // Check if token is expired or about to expire (within 5 minutes)
+  const isExpired = !tokens.expiry_date || 
+    new Date(tokens.expiry_date) < new Date(Date.now() + 5 * 60 * 1000);
+
+  if (isExpired && tokens.refresh_token) {
+    const newTokens = await refreshAccessToken(oauth2Client, tokens.refresh_token);
+    oauth2Client.setCredentials(newTokens);
+  } else {
+    oauth2Client.setCredentials({
+      access_token: tokens.access_token,
+      refresh_token: tokens.refresh_token,
+      expiry_date: tokens.expiry_date,
+    });
+  }
+
+  return google.drive({ version: "v3", auth: oauth2Client });
 };
 
 const ensureDir = (dir) => {
@@ -69,7 +113,7 @@ const dumpTablesToDir = async (tables, outDir) => {
 };
 
 const uploadToDrive = async (zipPath, fileName) => {
-  const drive = getDriveClient();
+  const drive = await getDriveClient();
 
   const createRes = await drive.files.create({
     requestBody: {
