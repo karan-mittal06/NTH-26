@@ -90,6 +90,25 @@ export const createTables = async () => {
             );
         `);
 
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS drive_oauth_tokens (
+                id INTEGER PRIMARY KEY DEFAULT 1,
+                access_token TEXT NOT NULL DEFAULT '',
+                refresh_token TEXT,
+                expiry_date BIGINT,
+                created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+                CONSTRAINT single_row CHECK (id = 1)
+            );
+        `);
+
+        // Insert default row for OAuth tokens if not exists
+        await client.query(`
+            INSERT INTO drive_oauth_tokens (id, access_token, refresh_token, expiry_date)
+            VALUES (1, '', NULL, NULL)
+            ON CONFLICT (id) DO NOTHING;
+        `);
+
         client.release();
         console.log("✅ Tables ensured.");
     } catch (err) {
