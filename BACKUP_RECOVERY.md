@@ -2,225 +2,167 @@
 
 ## Overview
 
-The NTH backup system creates JSON exports of all database tables, compresses them into a ZIP file, and uploads to Google Drive. This allows for easy recovery in case of data loss.
+The NTH backup system creates JSON exports of all database tables and uploads them to a **private GitHub repository**. This allows for easy recovery in case of data loss.
 
 ---
 
-## Setup: Google Cloud & Drive
+## Setup: GitHub Token & Repository
 
-### 1. Create a Google Cloud Project
+### 1. Create a Private GitHub Repository
 
-1. Go to [Google Cloud Console](https://console.cloud.google.com/)
-2. Create a new project or select an existing one
-3. Enable the **Google Drive API**:
-   - Go to "APIs & Services" → "Library"
-   - Search for "Google Drive API"
-   - Click "Enable"
+1. Go to [GitHub](https://github.com/) and create a new **private** repository
+2. Name it something like `nth-backups`
+3. Keep it empty (no README, .gitignore, etc.)
 
-### 2. Create a Service Account
+### 2. Create a Personal Access Token (Fine-grained)
 
-1. Go to "APIs & Services" → "Credentials"
-2. Click "Create Credentials" → "Service Account"
-3. Give it a name like `nth-backup-service`
-4. Click "Create and Continue"
-5. Skip the optional steps, click "Done"
-6. Click on the newly created service account
-7. Go to "Keys" tab
-8. Click "Add Key" → "Create new key" → "JSON"
-9. Save the downloaded JSON file securely
+1. Go to GitHub → Settings → Developer Settings → Personal Access Tokens → Fine-grained tokens
+2. Click "Generate new token"
+3. Name: `NTH Backup Token`
+4. Expiration: Set to "No expiration" or a long period
+5. Repository access: Select "Only select repositories" → choose your backup repo
+6. Permissions:
+   - Contents: **Read and Write**
+7. Click "Generate token"
+8. **Copy the token immediately** (you won't see it again!)
 
-### 3. Get Credentials from JSON
+### 3. Set Environment Variables
 
-From the downloaded JSON, extract:
-- `client_email` → Use as `GOOGLE_CLIENT_EMAIL`
-- `private_key` → Use as `GOOGLE_PRIVATE_KEY`
-
-### 4. Create a Google Drive Folder
-
-1. Go to [Google Drive](https://drive.google.com/)
-2. Create a new folder (e.g., "NTH Backups")
-3. Right-click the folder → "Share"
-4. Share with the `client_email` from step 3 (give "Editor" access)
-5. Copy the folder ID from the URL:
-   - URL format: `https://drive.google.com/drive/folders/FOLDER_ID_HERE`
-   - Use this ID as `GOOGLE_DRIVE_FOLDER_ID`
-
-### 5. Set Environment Variables
-
-Add to your `.env` file:
+Add to your `.env` file (admin folder):
 
 ```env
-GOOGLE_CLIENT_EMAIL=nth-backup-service@your-project.iam.gserviceaccount.com
-GOOGLE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nYOUR_PRIVATE_KEY_HERE\n-----END PRIVATE KEY-----\n"
-GOOGLE_DRIVE_FOLDER_ID=1ABC123xyz_your_folder_id
+# GitHub Backup (FREE!)
+GITHUB_TOKEN=github_pat_xxxxxxxxxxxxx
+GITHUB_REPO=yourusername/nth-backups
+GITHUB_BRANCH=main
+
+# Backup Security Token (generate with: openssl rand -hex 32)
 BACKUP_TOKEN=your-secure-random-token-here
+NEXT_PUBLIC_BACKUP_TOKEN=your-secure-random-token-here
 ```
-
-> ⚠️ **Important**: The `GOOGLE_PRIVATE_KEY` must include `\n` characters for line breaks, wrapped in quotes.
 
 ---
 
-## Manual Backup
+## How to Use
 
-### Via Admin Dashboard
+### From Dashboard
 
-1. Go to `/dashboard/timer` in the admin panel
-2. Click the **"Manual Backup"** button
-3. Wait for the backup to complete
-4. The backup will appear in your Google Drive folder
+1. Go to `/dashboard`
+2. Click "Create Backup" button
+3. Click "View Backups" to see all backups in GitHub
 
-### Via API
+### Manual Backup (API)
 
 ```bash
-curl -X POST https://your-admin-domain/api/backup \
-  -H "Authorization: Bearer YOUR_BACKUP_TOKEN"
+curl -X POST http://localhost:3000/api/backup \
+  -H "x-backup-token: your-backup-token"
 ```
 
----
-
-## Auto-Backup
-
-### Enable via Dashboard
-
-1. Go to `/dashboard/timer` in the admin panel
-2. Toggle **"Auto Backup"** to enabled
-3. Set the interval (minimum 600 seconds = 10 minutes)
-4. Click **"Save"**
-
-### File Naming
-
-- Manual backups: `nth-backup-DD-MM-YYYY_HH-MM.zip`
-- Auto backups: `nth-autobackup-DD-MM-YYYY_HH-MM.zip`
-
----
-
-## Recovery Procedure
-
-### Step 1: Download the Backup
-
-1. Go to Google Drive
-2. Navigate to your backup folder
-3. Download the ZIP file you want to restore
-
-### Step 2: Run Recovery Script
-
-#### Option A: Using the Recovery Script
+### List Backups (API)
 
 ```bash
-cd /path/to/NTH-26/admin
-
-# Install dependencies if not already done
-npm install pg
-
-# Run recovery
-DATABASE_URL="postgresql://nth:nthDB@123@localhost:6969/nthdatabase" node recovery.js path/to/backup.zip
-```
-
-#### Option B: Manual Recovery
-
-1. Extract the ZIP file:
-   ```bash
-   unzip nth-backup-01-02-2025_14-30.zip -d backup-restore/
-   ```
-
-2. Connect to PostgreSQL:
-   ```bash
-   psql postgresql://nth:nthDB@123@localhost:6969/nthdatabase
-   ```
-
-3. For each table, you can use Python or Node.js to read the JSON and insert:
-
-   **Using psql with JSON (example for users table):**
-   ```sql
-   -- First, clear existing data if needed
-   TRUNCATE users CASCADE;
-   
-   -- Then use COPY or INSERT statements
-   -- (See recovery.js for programmatic approach)
-   ```
-
-### Step 3: Verify Recovery
-
-```bash
-psql postgresql://nth:nthDB@123@localhost:6969/nthdatabase
-
-# Check row counts
-SELECT 'users' as table, COUNT(*) FROM users
-UNION ALL SELECT 'questions', COUNT(*) FROM questions
-UNION ALL SELECT 'answers', COUNT(*) FROM answers;
+curl http://localhost:3000/api/backup \
+  -H "x-backup-token: your-backup-token"
 ```
 
 ---
 
-## Docker Recovery
+## Backup Format
 
-If running in Docker:
+Backups are stored as JSON files in the `backups/` folder of your GitHub repo:
 
-### 1. Copy backup into container
-
-```bash
-docker cp backup.zip nth-26-admin-1:/app/backup.zip
+```
+nth-backups/
+└── backups/
+    ├── nth-backup-03-02-2026_14-30.json
+    ├── nth-backup-02-02-2026_10-15.json
+    └── ...
 ```
 
-### 2. Run recovery inside container
-
-```bash
-docker exec -it nth-26-admin-1 sh -c "cd /app && node recovery.js backup.zip"
-```
-
-### Alternative: Direct PostgreSQL Recovery
-
-```bash
-# Copy JSON files to postgres container
-docker cp backup-folder/. nth-26-postgres-1:/tmp/backup/
-
-# Connect to postgres
-docker exec -it nth-26-postgres-1 psql -U nth -d nthdatabase
-
-# Use \copy or write a script to import
+Each backup contains:
+```json
+{
+  "metadata": {
+    "generatedAt": "2026-02-03T14:30:00.000Z",
+    "tableCount": 5,
+    "tables": ["users", "questions", "answers", ...]
+  },
+  "tables": {
+    "users": [...],
+    "questions": [...],
+    ...
+  }
+}
 ```
 
 ---
 
-## Backup Contents
+## Recovery Process
 
-Each backup ZIP contains:
-- `_metadata.json` - Backup timestamp and table list
-- `users.json` - User accounts
-- `questions.json` - Quiz questions
-- `answers.json` - User answers/submissions
-- `leaderboard.json` - Leaderboard data
-- `timer.json` - Event timer settings
-- `backup_settings.json` - Auto-backup configuration
+### 1. Download Backup
 
----
+From GitHub, download the JSON backup file you want to restore.
 
-## Troubleshooting
+### 2. Run Recovery Script
 
-### "Insufficient permissions" error
-- Ensure the service account email has Editor access to the Drive folder
-- Re-share the folder with the service account
+```bash
+cd admin
+node recovery.js path/to/backup.json
+```
 
-### "Invalid private key" error
-- Check that `GOOGLE_PRIVATE_KEY` includes proper `\n` line breaks
-- The key should be wrapped in quotes in `.env`
+Or manually:
 
-### Recovery script fails
-- Ensure `DATABASE_URL` is set correctly
-- Check that the database is accessible
-- Verify the ZIP file is not corrupted
+```javascript
+const backup = require('./backup.json');
 
-### Auto-backup not running
-- Check the admin logs for errors
-- Verify Google credentials are set
-- Ensure minimum interval is 600 seconds
+for (const [table, rows] of Object.entries(backup.tables)) {
+  // Clear existing data
+  await pool.query(`DELETE FROM ${table}`);
+  
+  // Insert backup data
+  for (const row of rows) {
+    // ... insert logic
+  }
+}
+```
 
 ---
 
-## Best Practices
+## Deployment to Azure Linux VM
 
-1. **Regular Backups**: Enable auto-backup with at least 1-hour intervals during events
-2. **Test Recovery**: Periodically test the recovery process on a staging database
-3. **Multiple Copies**: Download backups locally periodically as an additional safeguard
-4. **Monitor Drive Storage**: Ensure your Google Drive has sufficient space
-5. **Secure Credentials**: Never commit `.env` or service account keys to git
+### Environment Variables on Azure
+
+Add these to your Azure VM environment or `.env` file:
+
+```env
+GITHUB_TOKEN=github_pat_xxxxxxxxxxxxx
+GITHUB_REPO=yourusername/nth-backups
+GITHUB_BRANCH=main
+BACKUP_TOKEN=your-secure-token
+NEXT_PUBLIC_BACKUP_TOKEN=your-secure-token
+```
+
+---
+
+## Security Notes
+
+- **Never commit `.env` files** to git
+- Use a **private** GitHub repository for backups
+- Keep `BACKUP_TOKEN` secure
+- Rotate GitHub token periodically
+- Fine-grained tokens are more secure than classic tokens
+
+---
+
+## Why GitHub vs Google Drive?
+
+| Feature | GitHub | Google Drive |
+|---------|--------|--------------|
+| **Cost** | ✅ FREE | ❌ Service Account needs Workspace ($) |
+| **Setup** | Very Easy | Complex OAuth |
+| **Version History** | ✅ Built-in | Manual |
+| **Storage** | Unlimited (small files) | 15GB free |
+| **API** | Simple REST | Complex |
+
+**TL;DR**: GitHub is simpler, free, and has built-in version control! 🎉
+

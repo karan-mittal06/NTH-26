@@ -163,9 +163,6 @@
 import pool from "@/lib/db";
 import schedule from "node-schedule";
 
-// Auto-backup job reference
-let autoBackupJob = null;
-
 async function storeKeyIncrementTimes(times) {
     const timesJson = JSON.stringify(times);
     const query = `UPDATE event_status SET intervals = $1 WHERE id = 1`;
@@ -286,87 +283,4 @@ const updateEventStatus = async (status, start, end) => {
 export const endEvent = async (start, end) => {
     Object.values(schedule.scheduledJobs).forEach(job => job.cancel());
     await updateEventStatus("inactive", new Date(start).toISOString(), new Date(end).toISOString());
-};
-
-// ==================== AUTO-BACKUP FUNCTIONS ====================
-
-export const startAutoBackup = async (intervalSeconds) => {
-    // Stop existing auto-backup job if any
-    if (autoBackupJob) {
-        autoBackupJob.cancel();
-        autoBackupJob = null;
-    }
-
-    if (intervalSeconds < 600) {
-        throw new Error("Interval must be at least 600 seconds (10 minutes)");
-    }
-
-    // Store settings in database
-    await pool.query(`
-        INSERT INTO backup_settings (id, enabled, interval_seconds)
-        VALUES (1, TRUE, $1)
-        ON CONFLICT (id) DO UPDATE SET
-            enabled = TRUE,
-            interval_seconds = $1
-    `, [intervalSeconds]);
-
-    // Schedule recurring backup
-    const rule = new schedule.RecurrenceRule();
-    rule.second = new schedule.Range(0, 59, intervalSeconds % 60 || 60);
-
-    // Use setInterval-style scheduling for flexibility
-    const runBackup = async () => {
-        try {
-            const { performBackup } = await import("@/app/api/backup/route");
-            const result = await performBackup(true);
-            console.log(`✅ Auto-backup completed: ${result.name}`);
-        } catch (err) {
-            console.error("❌ Auto-backup failed:", err.message);
-        }
-    };
-
-    // Run immediately, then schedule
-    await runBackup();
-
-    // Schedule recurring job
-    autoBackupJob = schedule.scheduleJob(`*/${Math.floor(intervalSeconds / 60)} * * * *`, runBackup);
-    
-    // Fallback: if interval is not minute-divisible, use setInterval
-    if (intervalSeconds % 60 !== 0) {
-        if (autoBackupJob) autoBackupJob.cancel();
-        const intervalId = setInterval(runBackup, intervalSeconds * 1000);
-        autoBackupJob = { cancel: () => clearInterval(intervalId) };
-    }
-
-    console.log(`✅ Auto-backup started with interval: ${intervalSeconds} seconds`);
-};
-
-export const stopAutoBackup = async () => {
-    if (autoBackupJob) {
-        autoBackupJob.cancel();
-        autoBackupJob = null;
-    }
-
-    await pool.query(`
-        UPDATE backup_settings SET enabled = FALSE WHERE id = 1
-    `);
-
-    console.log("✅ Auto-backup stopped");
-};
-
-export const getAutoBackupSettings = async () => {
-    const result = await pool.query(`SELECT * FROM backup_settings WHERE id = 1`);
-    return result.rows[0] || { enabled: false, interval_seconds: 3600 };
-};
-
-export const restoreAutoBackup = async () => {
-    try {
-        const settings = await getAutoBackupSettings();
-        if (settings && settings.enabled && settings.interval_seconds >= 600) {
-            console.log("🔄 Restoring auto-backup schedule...");
-            await startAutoBackup(settings.interval_seconds);
-        }
-    } catch (err) {
-        console.error("Error restoring auto-backup:", err.message);
-    }
 };

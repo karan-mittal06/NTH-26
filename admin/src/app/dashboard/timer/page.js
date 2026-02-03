@@ -227,6 +227,18 @@ const Page = () => {
         </div>
       </div>
 
+        setAutoBackupEnabled(true);
+        alert(`Auto-backup started with ${backupInterval}s interval`);
+      }
+    } catch (error) {
+      console.error("Auto-backup error:", error);
+      alert(error.message);
+    }
+    setBackupLoading(false);
+  };
+
+  return (
+    <div className="flex flex-col px-4 justify-center items-center min-h-screen py-20 gap-12">
       {/* Event Timer Section */}
       <div className="w-full max-w-md">
         {warning && <p className='text-center text-red-600'>Create new Timer</p>}
