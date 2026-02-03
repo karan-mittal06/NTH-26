@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 
 const DashboardContent = () => {
@@ -9,9 +9,9 @@ const DashboardContent = () => {
   const [message, setMessage] = useState(null);
   const [showBackups, setShowBackups] = useState(false);
   const [autoBackupEnabled, setAutoBackupEnabled] = useState(false);
-  const [autoBackupSeconds, setAutoBackupSeconds] = useState(600);
+  const [autoBackupSecondsInput, setAutoBackupSecondsInput] = useState("600");
 
-  const createBackup = async () => {
+  const createBackup = useCallback(async () => {
     setBackupLoading(true);
     setMessage(null);
     try {
@@ -35,7 +35,7 @@ const DashboardContent = () => {
     } finally {
       setBackupLoading(false);
     }
-  };
+  }, [showBackups]);
 
   const fetchBackups = async () => {
     try {
@@ -54,8 +54,11 @@ const DashboardContent = () => {
     }
   };
 
+  const autoBackupSeconds = useMemo(() => Number(autoBackupSecondsInput), [autoBackupSecondsInput]);
+  const autoBackupSecondsValid = Number.isFinite(autoBackupSeconds) && autoBackupSeconds >= 600;
+
   useEffect(() => {
-    if (!autoBackupEnabled || autoBackupSeconds < 600) return;
+    if (!autoBackupEnabled || !autoBackupSecondsValid) return;
 
     const intervalId = setInterval(() => {
       if (!backupLoading) {
@@ -64,7 +67,7 @@ const DashboardContent = () => {
     }, autoBackupSeconds * 1000);
 
     return () => clearInterval(intervalId);
-  }, [autoBackupEnabled, autoBackupSeconds, backupLoading, createBackup]);
+  }, [autoBackupEnabled, autoBackupSeconds, autoBackupSecondsValid, backupLoading, createBackup]);
 
   return (
     <div className="w-screen h-screen flex flex-col justify-center items-center pb-24 gap-8">
@@ -86,27 +89,25 @@ const DashboardContent = () => {
           </label>
           <input
             id="auto-backup-seconds"
-            type="number"
-            min={600}
-            step={1}
+            type="text"
+            inputMode="numeric"
             className="w-32 rounded border px-2 py-1 text-sm bg-transparent"
-            value={autoBackupSeconds}
-            onChange={(e) => {
-              const value = Number(e.target.value);
-              if (Number.isNaN(value)) return;
-              setAutoBackupSeconds(Math.max(600, value));
-            }}
+            value={autoBackupSecondsInput}
+            onChange={(e) => setAutoBackupSecondsInput(e.target.value)}
           />
-          <label className="text-sm flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={autoBackupEnabled}
-              onChange={(e) => setAutoBackupEnabled(e.target.checked)}
-            />
-            Enable
-          </label>
+          <Button
+            type="button"
+            variant={autoBackupEnabled ? "default" : "outline"}
+            onClick={() => setAutoBackupEnabled((prev) => !prev)}
+          >
+            {autoBackupEnabled ? "Enabled" : "Enable"}
+          </Button>
         </div>
-        <p className="text-xs text-gray-500">Minimum interval is 600 seconds.</p>
+        {!autoBackupSecondsValid ? (
+          <p className="text-xs text-red-500">Invalid value. Enter a number ≥ 600.</p>
+        ) : (
+          <p className="text-xs text-gray-500">Minimum interval is 600 seconds.</p>
+        )}
 
         {message && (
           <div
