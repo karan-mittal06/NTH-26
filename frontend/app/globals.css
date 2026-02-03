@@ -27,8 +27,31 @@
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: "avenixel", sans-serif;
-  scrollbar-width: none;
+  font-family: "Iceland", sans-serif;
+}
+
+/* Custom scrollbar for all pages */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) rgba(255, 255, 255, 0.05);
+}
+
+*::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+*::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
 }
 
 .pixel-corners, .pixel-corners-blue ,
@@ -340,3 +363,14 @@ body {
       0 -4px #000;
 }
 
+.aldrich-regular {
+  font-family: "Aldrich", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.iceland-regular {
+  font-family: "Iceland", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}

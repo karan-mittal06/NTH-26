@@ -1,109 +1,91 @@
 "use client";
 
+import '../team.css';
 import TrainerCard from '@/components/TrainerCard';
-import { FaInstagram, FaLinkedin, FaPhone } from 'react-icons/fa';  // Importing necessary icons
+import { FaInstagram, FaLinkedin, FaGithub } from 'react-icons/fa';
 
 const QuestionSetters = () => {
-  const trainers = [
-      {
-        name: "Aabha Jog",
-        id: "28029",
-        pokedex: "224",
-        time: "299:05",
-        badges: [
-          "/badges/9.png",
-          "/badges/8.png",
-          "/badges/7.png",
-          "/badges/6.png"
-        ],
-        avatar: "/admin/aabha.jpg",
-        linkedin: 'https://www.linkedin.com/in/aabha-jog-68aa162b2?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app',
-        instagram: 'https://www.instagram.com/aabhaj25/',
-        github: 'https://github.com/aabha25',
-      },
-      {
-        name: "Karan Mittal",
-        id: "28030",
-        pokedex: "225",
-        time: "299:05",
-        badges: [
-          "/badges/9.png",
-          "/badges/8.png",
-          "/badges/7.png",
-          "/badges/6.png"
-        ],
-        avatar: "/admin/karan.jpg",
-        linkedin: 'https://www.linkedin.com/in/karan-mittal-59a41a23a?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app',
-        instagram: 'https://www.instagram.com/karanmittal7303/',
-        github: 'https://github.com/karan-mittal06',
-      },
-      {
-        name: "Rashmi Abhyankar",
-        id: "28031",
-        pokedex: "226",
-        time: "299:05",
-        badges: [
-          "/badges/3.png",
-          "/badges/12.png",
-          "/badges/11.png",
-          "/badges/6.png"
-        ],
-        avatar: "/admin/rashmi.jpg",
-        linkedin: 'https://www.linkedin.com/in/rashmiabhyankar?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app',
-        instagram: 'https://www.instagram.com/_nidhi1214/',
-        github: 'https://github.com/ Rashmi-05',
-      },
-      {
-        name: "Shlok Sangamnerkar",
-        id: "28032",
-        pokedex: "227",
-        time: "299:05",
-        badges: [
-          "/badges/10.png",
-          "/badges/12.png",
-          "/badges/1.png",
-          "/badges/4.png"
-        ],
-        avatar: "/admin/shlok.jpg",
-        linkedin: ' https://www.linkedin.com/in/shlok-sangamnerkar/',
-        instagram: 'https://www.instagram.com/shlok__vic/',
-        github: 'https://github.com/Vic710',
-      },
-      {
-        name: "Anushree Kamath",
-        id: "28033",
-        pokedex: "228",
-        time: "299:05",
-        badges: [
-          "/badges/3.png",
-          "/badges/7.png",
-          "/badges/11.png",
-          "/badges/2.png"
-        ],
-        avatar: "/admin/anushree.jpg",
-        linkedin: 'https://www.linkedin.com/in/anushreekamath04/',
-        instagram: 'https://www.instagram.com/kamathanushree/',
-        github: 'https://github.com/siriuslycoding ',
-      },
-]
+  const spiderVerseSetters = [
+    {
+      name: "Sanyog Dilip Pakhale",
+      subtitle: "OG Spider • Mentor",
+      badge: "SETTER",
+      avatar: "/admin/sanyog.webp",
+      linkedin: 'https://www.linkedin.com/in/sanyog-dilip-pakhale-85829532a',
+      instagram: 'https://www.instagram.com/_sanyog____',
+      github: 'https://github.com/SanyogPakhale',
+      styleClass: 'style-1'
+    },
+    {
+      name: "Suruchi Warke",
+      subtitle: "Detective • 1933",
+      badge: "SETTER",
+      avatar: "/admin/suruchi.jpg",
+      linkedin: 'https://www.linkedin.com/in/suruchi-warke-98a2b532a',
+      instagram: 'https://www.instagram.com/suruchi_510',
+      github: 'https://github.com/suruchiwarke',
+      styleClass: 'style-2'
+    },
+    {
+      name: "Gargi Nemade",
+      subtitle: "Pilot • SP//dr",
+      badge: "SETTER",
+      avatar: "/admin/gargi.jpeg",
+      linkedin: ' https://www.linkedin.com/in/gargi-nemade-17a879328',
+      instagram: 'https://www.instagram.com/garginemade',
+      github: 'https://github.com/garginemade',
+      styleClass: 'style-3'
+    },
+    {
+      name: "Vivek Amrutkar",
+      subtitle: "Leader • Guardian",
+      badge: "SETTER",
+      avatar: "",
+      linkedin: '',
+      instagram: '',
+      github: '',
+      styleClass: 'style-3'
+    },
+    {
+      name: "Sharva Marawar",
+      subtitle: "Anarchist • Rebel",
+      badge: "SETTER",
+      avatar: "",
+      linkedin: '',
+      instagram: '',
+      github: '',
+      styleClass: 'style-3'
+    }
+  ];
 
   return (
-    <div className="px-8 relative h-full w-screen overflow-hidden">
-      <img
-        src={`main-bg-night.webp`}
-        alt="Background"
-        className="absolute w-full h-full -z-10 bottom-0 left-0 object-cover xl:object-fill"
-      />
-      <div className='h-full w-full overflow-y-scroll pb-10 [&::-webkit-scrollbar]:w-0 '>
-      <h1 className="md:text-7xl text-4xl font-bold text-center my-8 text-shadow">Question Setting Team</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8 h-full md:h-fit pt-10 pb-20 md:pb-0 [&::-webkit-scrollbar]:w-0">
-        {trainers.map((trainer, index) => (
-          <TrainerCard key={index} trainer={trainer}/>
-          
+    <div className="team-container">
+      <div className="profiles-container five-cards">
+        {spiderVerseSetters.map((setter, index) => (
+          <div key={index} className={`profile-card ${setter.styleClass}`}>
+            <div className="glitch-overlay"></div>
+            <div className="verse-badge">{setter.badge}</div>
+            <div className="header-bg"></div>
+            <div className="profile-photo-container">
+              <img src={setter.avatar} alt={setter.name} className="profile-photo" />
+            </div>
+            <div className="profile-info">
+              <h1 className="profile-name">{setter.name}</h1>
+              <p className="profile-subtitle">{setter.subtitle}</p>
+              <div className="social-links">
+                <a href={setter.instagram} target="_blank" rel="noopener noreferrer" className="social-link instagram" title="Instagram">
+                  <FaInstagram />
+                </a>
+                <a href={setter.linkedin} target="_blank" rel="noopener noreferrer" className="social-link linkedin" title="LinkedIn">
+                  <FaLinkedin />
+                </a>
+                <a href={setter.github} target="_blank" rel="noopener noreferrer" className="social-link github" title="GitHub">
+                  <FaGithub />
+                </a>
+              </div>
+            </div>
+          </div>
         ))}
-        <div className='flex-grow h-8'></div>
-
-      </div>
       </div>
     </div>
   );

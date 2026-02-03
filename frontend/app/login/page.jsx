@@ -4,8 +4,9 @@ import API from "@/utils/api"
 import { useRouter } from "next/navigation";
 import { Suspense, useEffect, useRef, useState } from "react"
 import { useSearchParams } from "next/navigation";
-import { Button, Card } from "pixel-retroui";
 import { toast } from "react-toastify";
+import "../register/register.css";
+import "../button.css";
 
 function ToastFunction(){
   const toastShown = useRef(false);
@@ -50,72 +51,83 @@ export default function LoginPage(){
     };
 
     return (
-      <div className="h-[100%] flex items-center justify-center p-4 relative">
+      <div className="h-screen overflow-y-auto relative">
         <Suspense fallback={null}>
           <ToastFunction />
         </Suspense>
+
         <img
-          src={`night-pokemon-bg.webp`}
+          src={`Bert-Spider-Verse.webp`}
           alt="Background"
-          className="absolute w-full h-full -z-10 bottom-0 object-cover xl:object-fill opacity-75"
+          className="fixed inset-0 w-full h-full -z-10 object-cover opacity-50 auth-bg-shift"
         />
-        <div className="">
-            <img
-              src={`/pokemons/p12.gif`}
-              alt="Background"
-              className="absolute right-[8%] bottom-0 sm:-translate-y-[60%] -translate-y-[25%] object-cover xl:object-fill z-[5] sm:w-auto sm:h-auto  sm:scale-[2] scale-[1.5]"
-            />
-            <img
-              src={`/pokemons/p13.gif`}
-              alt="Background"
-              className="absolute left-[8%] bottom-0 sm:-translate-y-[60%] -translate-y-[25%] object-cover xl:object-fill z-[5] sm:w-auto sm:h-auto  sm:scale-[2] scale-[1.5]"
-            />
-        </div>
-        <Card 
-          bg="#111827"
-          borderColor="#4b5563"
-          shadowColor="#4b5563"
-          className="py-4 px-8 min-w-[350px] w-[50vw] xl:w-[30vw]"
-        >
-          <h1 className="text-4xl font-bold text-center text-gray-200 mb-6">Login</h1>
-  
-          <form onSubmit={handleSubmit}>
+        <div className="fixed inset-0 -z-10 bg-gradient-to-b from-white/20 via-gray-400/30 to-gray-600/50"></div>
+        
+        <div className="min-h-screen flex items-center justify-center p-4 py-8">
+          <div className="w-[90vw] max-w-[500px] z-10 my-16">
+            <h1 className="text-4xl md:text-5xl font-bold text-center mb-4 text-white drop-shadow-[0_0_25px_rgba(220,38,38,0.6)]">Login</h1>
+          
+            <form onSubmit={handleSubmit}>
+            {/* Username Field */}
             <div className="mb-4">
-              <input
-                type="text"
-                placeholder="Username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-700 text-black text-lg"
-              />
+              <label className="block text-white text-xl font-semibold mb-2 ml-2 drop-shadow-lg">Username</label>
+              <div className="input-wrapper relative">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-red-400 text-xl z-10">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <input
+                  type="text"
+                  placeholder="Enter your username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  className="mystic-input w-full p-4 pl-12 bg-slate-900 bg-opacity-60 text-white placeholder-slate-200 placeholder-opacity-60 rounded-full focus:outline-none text-lg"
+                />
+              </div>
             </div>
-            <div className="mb-6">
-              <input
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-700 text-black text-lg"
-              />
+
+            {/* Password Field */}
+            <div className="mb-4">
+              <label className="block text-white text-xl font-semibold mb-2 ml-2 drop-shadow-lg">Password</label>
+              <div className="input-wrapper relative">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-red-400 text-xl z-10">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <input
+                  type="password"
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="mystic-input w-full p-4 pl-12 bg-slate-900 bg-opacity-60 text-white placeholder-slate-200 placeholder-opacity-60 rounded-full focus:outline-none text-lg"
+                />
+              </div>
             </div>
-            <Button
+
+            {/* Login Button */}
+            <button
               type="submit"
               disabled={loading}
-              className={`w-[95%] py-3 text-white rounded-md focus:outline-none ${loading ? 'bg-gray-600' : 'bg-gray-700 hover:bg-gray-800'}`}
+              className="cybr-btn w-full mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Logging in...' : 'Login'}
-            </Button>
+              {loading ? 'Logging in...' : 'Login'}<span aria-hidden>_</span>
+              <span aria-hidden className="cybr-btn__glitch">{loading ? 'Logging in..._' : 'Login_'}</span>
+              <span aria-hidden className="cybr-btn__tag">NTH</span>
+            </button>
           </form>
-          <p className="mt-4 text-center text-gray-400">
+          <p className="mt-4 text-center text-white text-lg drop-shadow-lg">
             Not a user yet?{' '}
             <button
               onClick={() => router.push('/register')}
-              className="text-gray-200 underline hover:text-gray-400"
+              className="text-red-400 hover:text-red-600 underline font-semibold"
             >
               Register here
             </button>
           </p>
-        </Card>
+          </div>
+        </div>
       </div>
     );
 }
