@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 
 const DashboardContent = () => {
@@ -8,6 +8,8 @@ const DashboardContent = () => {
   const [backups, setBackups] = useState([]);
   const [message, setMessage] = useState(null);
   const [showBackups, setShowBackups] = useState(false);
+  const [autoBackupEnabled, setAutoBackupEnabled] = useState(false);
+  const [autoBackupSeconds, setAutoBackupSeconds] = useState(600);
 
   const createBackup = async () => {
     setBackupLoading(true);
@@ -52,6 +54,18 @@ const DashboardContent = () => {
     }
   };
 
+  useEffect(() => {
+    if (!autoBackupEnabled || autoBackupSeconds < 600) return;
+
+    const intervalId = setInterval(() => {
+      if (!backupLoading) {
+        createBackup();
+      }
+    }, autoBackupSeconds * 1000);
+
+    return () => clearInterval(intervalId);
+  }, [autoBackupEnabled, autoBackupSeconds, backupLoading, createBackup]);
+
   return (
     <div className="w-screen h-screen flex flex-col justify-center items-center pb-24 gap-8">
       <p className="md:text-9xl text-5xl">NTH Admin</p>
@@ -65,6 +79,34 @@ const DashboardContent = () => {
             View Backups
           </Button>
         </div>
+
+        <div className="flex items-center gap-3 mt-2">
+          <label className="text-sm font-medium" htmlFor="auto-backup-seconds">
+            Auto Backup (seconds)
+          </label>
+          <input
+            id="auto-backup-seconds"
+            type="number"
+            min={600}
+            step={1}
+            className="w-32 rounded border px-2 py-1 text-sm bg-transparent"
+            value={autoBackupSeconds}
+            onChange={(e) => {
+              const value = Number(e.target.value);
+              if (Number.isNaN(value)) return;
+              setAutoBackupSeconds(Math.max(600, value));
+            }}
+          />
+          <label className="text-sm flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={autoBackupEnabled}
+              onChange={(e) => setAutoBackupEnabled(e.target.checked)}
+            />
+            Enable
+          </label>
+        </div>
+        <p className="text-xs text-gray-500">Minimum interval is 600 seconds.</p>
 
         {message && (
           <div
