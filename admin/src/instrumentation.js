@@ -33,7 +33,8 @@ export async function register() {
   if (process.env.NEXT_RUNTIME === "nodejs") {
     try {
       const pool = (await import("@/lib/db")).default;
-      const { startTimer, restoreAutoBackup } = (await import("@/lib/timer"));
+      const { startTimer } = (await import("@/lib/timer"));
+      const { restoreAutoBackup } = (await import("@/lib/backupScheduler"));
 
       // Restore event timer
       const query = `SELECT start_time FROM event_status WHERE id = 1`;

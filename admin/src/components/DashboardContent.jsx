@@ -10,6 +10,26 @@ const DashboardContent = () => {
   const [showBackups, setShowBackups] = useState(false);
   const [autoBackupEnabled, setAutoBackupEnabled] = useState(false);
   const [autoBackupSecondsInput, setAutoBackupSecondsInput] = useState("600");
+  const [autoBackupSaving, setAutoBackupSaving] = useState(false);
+  const [autoBackupMessage, setAutoBackupMessage] = useState(null);
+  const [autoBackupStatus, setAutoBackupStatus] = useState(null);
+
+  const fetchBackups = useCallback(async () => {
+    try {
+      const res = await fetch("/superusers-admin/api/backup", {
+        headers: {
+          "x-backup-token": process.env.NEXT_PUBLIC_BACKUP_TOKEN || "default-token",
+        },
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setBackups(data.backups || []);
+        setShowBackups(true);
+      }
+    } catch (error) {
+      console.error("Failed to fetch backups:", error);
+    }
+  }, []);
 
   const createBackup = useCallback(async () => {
     setBackupLoading(true);
@@ -35,39 +55,73 @@ const DashboardContent = () => {
     } finally {
       setBackupLoading(false);
     }
-  }, [showBackups]);
+  }, [fetchBackups, showBackups]);
 
-  const fetchBackups = async () => {
+  const autoBackupSeconds = useMemo(() => Number(autoBackupSecondsInput), [autoBackupSecondsInput]);
+  const autoBackupSecondsValid = Number.isFinite(autoBackupSeconds) && autoBackupSeconds >= 600;
+
+  const loadAutoBackupSettings = useCallback(async () => {
+    setAutoBackupSaving(true);
     try {
-      const res = await fetch("/superusers-admin/api/backup", {
+      const res = await fetch("/superusers-admin/api/backup/settings", {
         headers: {
           "x-backup-token": process.env.NEXT_PUBLIC_BACKUP_TOKEN || "default-token",
         },
       });
       const data = await res.json();
       if (res.ok) {
-        setBackups(data.backups || []);
-        setShowBackups(true);
+        setAutoBackupEnabled(Boolean(data.enabled));
+        setAutoBackupSecondsInput(String(data.interval_seconds ?? 600));
+        setAutoBackupStatus(data);
+      } else {
+        setAutoBackupMessage({ type: "error", text: data.message || "Failed to load auto-backup settings" });
       }
     } catch (error) {
-      console.error("Failed to fetch backups:", error);
+      setAutoBackupMessage({ type: "error", text: "Failed to load auto-backup settings" });
+    } finally {
+      setAutoBackupSaving(false);
     }
-  };
-
-  const autoBackupSeconds = useMemo(() => Number(autoBackupSecondsInput), [autoBackupSecondsInput]);
-  const autoBackupSecondsValid = Number.isFinite(autoBackupSeconds) && autoBackupSeconds >= 600;
+  }, []);
 
   useEffect(() => {
-    if (!autoBackupEnabled || !autoBackupSecondsValid) return;
+    loadAutoBackupSettings();
+  }, [loadAutoBackupSettings]);
 
-    const intervalId = setInterval(() => {
-      if (!backupLoading) {
-        createBackup();
+  const saveAutoBackupSettings = async () => {
+    if (!autoBackupSecondsValid) {
+      setAutoBackupMessage({ type: "error", text: "Invalid value. Enter a number ≥ 600." });
+      return;
+    }
+
+    setAutoBackupSaving(true);
+    try {
+      const res = await fetch("/superusers-admin/api/backup/settings", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-backup-token": process.env.NEXT_PUBLIC_BACKUP_TOKEN || "default-token",
+        },
+        body: JSON.stringify({
+          enabled: autoBackupEnabled,
+          interval_seconds: autoBackupSeconds,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setAutoBackupStatus(data);
+        setAutoBackupMessage({
+          type: "success",
+          text: `Auto backup ${data.enabled ? "enabled" : "disabled"}.`,
+        });
+      } else {
+        setAutoBackupMessage({ type: "error", text: data.message || "Failed to save auto-backup settings" });
       }
-    }, autoBackupSeconds * 1000);
-
-    return () => clearInterval(intervalId);
-  }, [autoBackupEnabled, autoBackupSeconds, autoBackupSecondsValid, backupLoading, createBackup]);
+    } catch (error) {
+      setAutoBackupMessage({ type: "error", text: "Failed to save auto-backup settings" });
+    } finally {
+      setAutoBackupSaving(false);
+    }
+  };
 
   return (
     <div className="w-screen h-screen flex flex-col justify-center items-center pb-24 gap-8">
@@ -93,7 +147,14 @@ const DashboardContent = () => {
             inputMode="numeric"
             className="w-32 rounded border px-2 py-1 text-sm bg-transparent"
             value={autoBackupSecondsInput}
-            onChange={(e) => setAutoBackupSecondsInput(e.target.value)}
+            onChange={(e) => {
+              setAutoBackupSecondsInput(e.target.value);
+              setAutoBackupEnabled(false);
+              setAutoBackupMessage({
+                type: "info",
+                text: "Interval changed. Toggle and apply to enable auto backup.",
+              });
+            }}
           />
           <Button
             type="button"
@@ -102,11 +163,44 @@ const DashboardContent = () => {
           >
             {autoBackupEnabled ? "Enabled" : "Enable"}
           </Button>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={saveAutoBackupSettings}
+            disabled={autoBackupSaving}
+          >
+            {autoBackupSaving ? "Saving..." : "Apply"}
+          </Button>
         </div>
         {!autoBackupSecondsValid ? (
           <p className="text-xs text-red-500">Invalid value. Enter a number ≥ 600.</p>
         ) : (
           <p className="text-xs text-gray-500">Minimum interval is 600 seconds.</p>
+        )}
+
+        {autoBackupMessage && (
+          <div
+            className={`mt-2 px-3 py-2 rounded text-sm ${
+              autoBackupMessage.type === "success"
+                ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
+                : autoBackupMessage.type === "info"
+                ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
+                : "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300"
+            }`}
+          >
+            {autoBackupMessage.text}
+          </div>
+        )}
+
+        {autoBackupStatus && (
+          <div className="mt-2 text-xs text-gray-500">
+            <div>Status: {autoBackupStatus.enabled ? "Enabled" : "Disabled"}</div>
+            <div>Last Run: {autoBackupStatus.last_run ? new Date(autoBackupStatus.last_run).toLocaleString() : "Never"}</div>
+            <div>Next Run: {autoBackupStatus.next_run ? new Date(autoBackupStatus.next_run).toLocaleString() : "—"}</div>
+            {autoBackupStatus.last_error && (
+              <div className="text-red-500">Last Error: {autoBackupStatus.last_error}</div>
+            )}
+          </div>
         )}
 
         {message && (
