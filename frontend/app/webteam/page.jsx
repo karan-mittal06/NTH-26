@@ -1,60 +1,58 @@
-import TrainerCard from '@/components/TrainerCard';
+import '../team.css';
+import { FaInstagram, FaLinkedin, FaGithub } from 'react-icons/fa';
 
 const Webteam = () => {
+  const trainers = [
+    {
+      name: "Anushree Kamath",
+      subtitle: "Web-Slinger • Hero of Brooklyn",
+      badge: "NTH HEAD • WEB DEVELOPER",
+      avatar: "/admin/anushree.jpg",
+      linkedin: 'https://www.linkedin.com/in/anushreekamath04/',
+      instagram: 'https://www.instagram.com/kamathanushree/',
+      github: 'https://github.com/siriuslycoding',
+      styleClass: 'style-1'
+    },
+    {
+      name: "Karan Mittal",
+      subtitle: "Spider-Ghost • Drummer",
+      badge: "NTH HEAD • WEB DEVELOPER",
+      avatar: "/admin/karan.jpg",
+      linkedin: 'https://www.linkedin.com/in/karan-mittal-59a41a23a?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app',
+      instagram: 'https://www.instagram.com/karanmittal7303/',
+      github: 'https://github.com/karan-mittal06',
+      styleClass: 'style-2'
+    },
+  ]
 
-    const trainers = [
-        {
-            name: "Samir Wankhede",
-            id: "28030",
-            pokedex: "224",
-            time: "299:05",
-            badges: [
-              "/badges/1.png",
-              "/badges/2.png",
-              "/badges/4.png",
-              "/badges/5.png",
-
-            ],
-            avatar: "/admin/samir.jpg",
-            linkedin: 'https://www.linkedin.com/in/samir-wankhede/',
-            instagram: 'https://www.instagram.com/_samirwankhede_/',
-            github: 'https://github.com/Samir-Wankhede',
-            phone: 7770011526,
-          },
-          {
-            name: "B Shrinidhi",
-            id: "28031",
-            pokedex: "225",
-            time: "299:05",
-            badges: [
-              "/badges/10.png",
-              "/badges/7.png",
-              "/badges/8.png",
-              "/badges/11.png"
-            ],
-            avatar: "/admin/shrinidhi.jpg",
-            linkedin: 'https://www.linkedin.com/in/b-shrinidhi/',
-            instagram: 'https://www.instagram.com/_nidhi1214/',
-            github: 'https://github.com/shrinidhib',
-            phone: 7506211747,
-          }
-    ]
-   
   return (
-    <div className="px-8 relative h-full w-screen overflow-hidden">
-      <img
-        src={`main-bg-night.webp`}
-        alt="Background"
-        className="absolute w-full h-full -z-10 bottom-0 left-0 object-cover xl:object-fill"
-      />
-      <div className='h-full w-full overflow-y-scroll pb-10 [&::-webkit-scrollbar]:w-0 '>
-      <h1 className="text-7xl font-bold text-center my-8 text-shadow">Web Team</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8 h-full md:h-fit pt-10 pb-20 md:pb-0 [&::-webkit-scrollbar]:w-0">
+    <div className="team-container">
+      <div className="profiles-container">
         {trainers.map((trainer, index) => (
-          <TrainerCard key={index} trainer={trainer}/>
+          <div key={index} className={`profile-card ${trainer.styleClass}`}>
+            <div className="glitch-overlay"></div>
+            <div className="verse-badge">{trainer.badge}</div>
+            <div className="header-bg"></div>
+            <div className="profile-photo-container">
+              <img src={trainer.avatar} alt={trainer.name} className="profile-photo" />
+            </div>
+            <div className="profile-info">
+              <h1 className="profile-name">{trainer.name}</h1>
+              <p className="profile-subtitle">{trainer.subtitle}</p>
+              <div className="social-links">
+                <a href={trainer.instagram} target="_blank" rel="noopener noreferrer" className="social-link instagram" title="Instagram">
+                  <FaInstagram />
+                </a>
+                <a href={trainer.linkedin} target="_blank" rel="noopener noreferrer" className="social-link linkedin" title="LinkedIn">
+                  <FaLinkedin />
+                </a>
+                <a href={trainer.github} target="_blank" rel="noopener noreferrer" className="social-link github" title="GitHub">
+                  <FaGithub />
+                </a>
+              </div>
+            </div>
+          </div>
         ))}
-        <div className='flex-grow h-8'></div>
-      </div>
       </div>
     </div>
   );

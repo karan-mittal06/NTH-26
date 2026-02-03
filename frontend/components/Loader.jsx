@@ -11,7 +11,7 @@ const Loader = () => {
     <div className='h-full w-full flex flex-col justify-center items-center gap-1'>
       {loader && 
       <div className="text-2xl flex flex-col justify-center items-center gap-1">
-      <img src={`/pokemons/p${loader}.gif`}/>
+      {/* <img src={`/pokemons/p${loader}.gif`}/> */}
       <h1>Loading...</h1> 
       </div>
       }

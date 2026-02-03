@@ -6,6 +6,8 @@ import Loader from "./Loader";
 import Link from "next/link";
 import { Button } from "pixel-retroui";
 import { toast } from "react-toastify";
+import "./NavLink.css";
+import "../app/button.css";
 
 const Timer = () => {
   const [eventStartTime, setEventStartTime ]= useState(null);
@@ -115,15 +117,22 @@ const Timer = () => {
         </div>
         ))
       }
-      <Link href={'/instructions'}>
+      <Link href={'/register'}>
+        <button className="cybr-btn how-to-play my-4">
+          Register Now<span aria-hidden>_</span>
+          <span aria-hidden className="cybr-btn__glitch">Register Now_</span>
+          <span aria-hidden className="cybr-btn__tag">NTH</span>
+        </button>
+      </Link>
+      {/* <Link href={'/instructions'}>
         <Button 
           bg="white"
           borderColor="black"
-          className=" px-4 py-1 my-4"
+          className="px-4 py-1 my-4 iceland-regular text-xl"
         >
-          Instructions
+          How to Play
         </Button>
-      </Link>
+      </Link> */}
     </div>
   );
 };

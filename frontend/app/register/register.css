@@ -1,0 +1,38 @@
+/* Doctor Strange style mystic input border - Elegant animated comet */
+.input-wrapper {
+    position: relative;
+    padding: 3px;
+    background: linear-gradient(90deg, 
+        rgba(8, 18, 46, 0.3) 0%, 
+        rgba(10, 17, 33, 0.5) 20%,
+        rgba(73, 16, 16, 0.7) 35%,
+        rgba(71, 12, 12, 0.9) 50%,
+        rgba(73, 16, 16, 0.7) 65%,
+        rgba(10, 17, 33, 0.5) 80%,
+        rgba(8, 18, 46, 0.3) 100%);
+    background-size: 200% 100%;
+    border-radius: 9999px;
+    animation: cometMove 10s linear infinite;
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+}
+
+.mystic-input {
+    position: relative;
+    z-index: 1;
+}
+
+@keyframes cometMove {
+    0% {
+        background-position: 200% 50%;
+    }
+    100% {
+        background-position: -200% 50%;
+    }
+}
+
+/* Shift background image focal point right on smaller screens only */
+@media (max-width: 1024px) {
+    .auth-bg-shift {
+        object-position: 47.5% center;
+    }
+}
