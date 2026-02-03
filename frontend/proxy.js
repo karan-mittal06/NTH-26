@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-export async function middleware(request) {;
+export async function proxy(request) {;
   const tokenCookie = request.cookies.get('token')?.value;
   // console.log("token: ",tokenCookie);
   if (!tokenCookie) {
