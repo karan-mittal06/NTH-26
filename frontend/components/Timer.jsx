@@ -8,8 +8,10 @@ import { Button } from "pixel-retroui";
 import { toast } from "react-toastify";
 import "./NavLink.css";
 import "../app/button.css";
+import { useAuth } from "@/context/AuthProvider";
 
 const Timer = () => {
+  const { user } = useAuth();
   const [eventStartTime, setEventStartTime ]= useState(null);
   const [eventEndTime, setEventEndTime ]= useState(null);
   const [timeRemaining, setTimeRemaining] = useState(null);
@@ -117,13 +119,14 @@ const Timer = () => {
         </div>
         ))
       }
-      <Link href={'/register'}>
-        <button className="cybr-btn how-to-play my-4">
-          Register Now<span aria-hidden>_</span>
-          <span aria-hidden className="cybr-btn__glitch">Register Now_</span>
-          <span aria-hidden className="cybr-btn__tag">NTH</span>
-        </button>
-      </Link>
+      {!user && (
+        <Link href={'/register'}>
+          <button className="cybr-btn how-to-play my-4">
+            Register Now<span aria-hidden>_</span>
+            <span aria-hidden className="cybr-btn__glitch">Register Now_</span>
+          </button>
+        </Link>
+      )}
       {/* <Link href={'/instructions'}>
         <Button 
           bg="white"

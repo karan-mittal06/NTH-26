@@ -21,7 +21,7 @@ const Webteam = () => {
       linkedin: 'https://www.linkedin.com/in/karan-mittal-59a41a23a?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app',
       instagram: 'https://www.instagram.com/karanmittal7303/',
       github: 'https://github.com/karan-mittal06',
-      styleClass: 'style-2'
+      styleClass: 'style-3'
     },
   ]
 

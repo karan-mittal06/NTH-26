@@ -31,8 +31,8 @@ const Navbar = () => {
         <p data-glitch="Register" className={`glitch ${pathname === "/register" ? "border-b-2 border-white" : ""}`}>Register</p>
       </Link>
     ) : (
-      <button onClick={logout} data-glitch="Logout" className="glitch nav-item">
-        Logout
+      <button onClick={logout} className="nav-item bg-transparent border-0 p-0">
+        <span data-glitch="Logout" className="glitch">Logout</span>
       </button>
     )}
   </>
