@@ -1,10 +1,12 @@
 "use client";
 import "./NavLink.css";
 import { useAuth } from "@/context/AuthProvider";
+import API from "@/utils/api";
 import Link from "next/link";
-import { usePathname} from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { GiAxeSword, GiHamburgerMenu } from "react-icons/gi";
+import { toast } from "react-toastify";
 usePathname
 
 
@@ -12,17 +14,50 @@ const Navbar = () => {
   const { user, logout } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
 
   const toggleMenu = () => setIsOpen(!isOpen);
+
+  const handleHuntClick = async () => {
+    if (!user) {
+      router.push("/login");
+      return;
+    }
+
+    try {
+      const res = await API.get("/timer/time");
+      if (res.status === 200) {
+        const { start_time } = res.data;
+        if (!start_time) {
+          toast.info("Hunt hasn't started yet!");
+          return;
+        }
+
+        const start = new Date(start_time);
+        const now = new Date();
+
+        if (now < start) {
+          toast.info("Hunt hasn't started yet!");
+          return;
+        }
+
+        router.push("/question/put_your_answer_here");
+      } else {
+        toast.error("Failed to fetch event start time.");
+      }
+    } catch (error) {
+      toast.error("Backend not connected or hunt hasn't begun yet.");
+    }
+  };
 
   const navItems = (
     <>
     <Link href="/leaderboard" className="nav-item">
       <p data-glitch="Leaderboard" className={`glitch ${pathname === "/leaderboard" ? "border-b-2 border-white" : ""}`}>Leaderboard</p>
     </Link>
-    <Link href="/question/put_your_answer_here" className="nav-item">
+    <button onClick={handleHuntClick} className="nav-item bg-transparent border-0 p-0">
       <p data-glitch="Hunt" className={`glitch ${pathname === "/question/put_your_answer_here" ? "border-b-2 border-white" : ""}`}>Hunt</p>
-    </Link>
+    </button>
     <Link href="/instructions" className="nav-item">
       <p data-glitch="How to Play" className={`glitch ${pathname === "/instructions" ? "border-b-2 border-white" : ""}`}>How to Play</p>
     </Link>
