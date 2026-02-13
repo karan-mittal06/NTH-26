@@ -46,7 +46,7 @@ const Navbar = () => {
         toast.error("Failed to fetch event start time.");
       }
     } catch (error) {
-      toast.error("Backend not connected or hunt hasn't begun yet.");
+      toast.error("Hunt hasn't started yet!");
     }
   };
 
