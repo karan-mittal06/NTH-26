@@ -16,7 +16,7 @@ const app = express();
 const PORT = process.env.PORT || 3000
 
 app.set('trust proxy', true);
-app.use(cors({origin:["https://nth.credenz.co.in"],credentials: true}));
+app.use(cors({origin:["https://nthtesting.credenz.co.in"],credentials: true}));
 app.use(express.json());
 app.use(cookieParser());
 app.use((req,res,next)=>{
