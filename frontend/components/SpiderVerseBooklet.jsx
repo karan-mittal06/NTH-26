@@ -146,11 +146,11 @@ const SpiderVerseBooklet = () => {
         </div>
       </div>
 
-      <div className="mt-6 flex items-center justify-between">
+      <div className="mt-6 grid grid-cols-[1fr_auto_1fr] items-center">
         <button
           onClick={handlePrev}
           disabled={pageIndex === 0}
-          className="px-4 py-2 border border-white text-sm uppercase tracking-wider disabled:opacity-40 disabled:cursor-not-allowed"
+          className="px-4 py-2 border border-white text-sm uppercase tracking-wider disabled:opacity-40 disabled:cursor-not-allowed justify-self-start min-w-[110px]"
         >
           Previous
         </button>
@@ -160,7 +160,7 @@ const SpiderVerseBooklet = () => {
         <button
           onClick={handleNext}
           disabled={pageIndex === pages.length - 1}
-          className="px-4 py-2 border border-white text-sm uppercase tracking-wider disabled:opacity-40 disabled:cursor-not-allowed"
+          className="px-4 py-2 border border-white text-sm uppercase tracking-wider disabled:opacity-40 disabled:cursor-not-allowed justify-self-end min-w-[110px]"
         >
           Next
         </button>
