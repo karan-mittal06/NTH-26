@@ -4,6 +4,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { ToastUtils } from "@/utils/toastifyContainer";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata = {
   title: "Network Treasure Hunt",
