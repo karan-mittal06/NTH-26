@@ -1,3 +1,7 @@
+"use client";
+
+import React, { useState } from "react";
+
 const pages = [
   {
     title: "NTH",
@@ -106,3 +110,63 @@ const pages = [
     icon: "🚀"
   }
 ];
+
+const SpiderVerseBooklet = () => {
+  const [pageIndex, setPageIndex] = useState(0);
+  const page = pages[pageIndex];
+
+  const handlePrev = () => {
+    if (pageIndex > 0) setPageIndex(pageIndex - 1);
+  };
+
+  const handleNext = () => {
+    if (pageIndex < pages.length - 1) setPageIndex(pageIndex + 1);
+  };
+
+  return (
+    <div className="relative z-10 max-w-4xl mx-auto px-4 pt-24 pb-12 text-white">
+      <div className="relative">
+        <div className="absolute -inset-2 bg-gradient-to-r from-red-500/30 via-purple-500/30 to-cyan-500/30 blur-lg"></div>
+        <div className="relative bg-black/70 border-2 border-white p-6 md:p-8 shadow-2xl">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <p className="text-sm uppercase tracking-widest text-gray-300">{page.subtitle}</p>
+              <h1 className="text-3xl md:text-4xl font-bold uppercase tracking-wider">{page.title}</h1>
+            </div>
+            <div className="text-4xl md:text-5xl">{page.icon}</div>
+          </div>
+
+          <ul className="mt-6 space-y-2 text-base md:text-lg text-gray-200">
+            {page.content.map((line, idx) => (
+              <li key={idx} className="leading-relaxed">
+                {line}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      <div className="mt-6 flex items-center justify-between">
+        <button
+          onClick={handlePrev}
+          disabled={pageIndex === 0}
+          className="px-4 py-2 border border-white text-sm uppercase tracking-wider disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          Previous
+        </button>
+        <div className="text-sm uppercase tracking-widest text-gray-300">
+          {pageIndex + 1} / {pages.length}
+        </div>
+        <button
+          onClick={handleNext}
+          disabled={pageIndex === pages.length - 1}
+          className="px-4 py-2 border border-white text-sm uppercase tracking-wider disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default SpiderVerseBooklet;
