@@ -2,7 +2,7 @@ import SpiderVerseBooklet from '@/components/SpiderVerseBooklet'
 
 const InstructionsPage = () => {
   return (
-    <div className="h-screen overflow-hidden relative">
+    <div className="h-screen overflow-hidden relative flex items-center justify-center">
       {/* Spider-Verse background */}
       <img
         src={`how_to_play.jpg`}
@@ -11,7 +11,7 @@ const InstructionsPage = () => {
       />
       
       {/* Animated gradient overlay */}
-      <div className="fixed inset-0 -z-10 bg-gradient-to-b from-black/60 via-red-900/20 to-purple-900/40"></div>
+      <div className="fixed inset-0 -z-10 bg-gradient-to-b from-black/60 via-red-900/20 to-black/40"></div>
       
       {/* Comic book halftone dots effect */}
       <div className="fixed inset-0 -z-10 opacity-10">

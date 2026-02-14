@@ -124,7 +124,7 @@ const SpiderVerseBooklet = () => {
   };
 
   return (
-    <div className="relative z-10 max-w-4xl mx-auto px-4 pt-24 pb-12 text-white">
+    <div className="relative z-10 max-w-4xl mx-auto px-4 py-12 text-white">
       <div className="relative">
         <div className="absolute -inset-2 bg-gradient-to-r from-red-500/30 via-purple-500/30 to-cyan-500/30 blur-lg"></div>
         <div className="relative bg-black/70 border-2 border-white p-6 md:p-8 shadow-2xl">
