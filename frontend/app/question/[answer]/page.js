@@ -207,22 +207,15 @@ const QuestionPage = ({params})=>{
       }
 
     return (
-      <div className="h-[100%]">
-      <div className="">
-          <img
-            src={`/pokemons/p${question.level % 10}.gif`}
-            alt="Background"
-            className="absolute right-[8%] bottom-[15%] object-cover xl:object-fill z-[-2] sm:block sm:w-auto sm:h-auto  sm:scale-[2] scale-[1] hidden"
-          />
-      </div>
+      <div className="min-h-screen pt-24">
   
       <div className="p-8 max-w-3xl mx-auto h-[100%]">
        
         <div className="flex justify-center gap-10 items-center">
         <div className="flex flex-col items-center mb-2 group relative">
           <img
-            src="/pika.gif"
-            alt="Pika Gif"
+            src="/miles.gif"
+            alt="Miles Gif"
             className="cursor-pointer h-10"
           />
           <div className="absolute hidden group-hover:block bg-gray-100 text-black sm:text-sm font-bold rounded-lg px-4 py-2 right-[105%] border-[0.20rem] border-yellow-500 shadow-lg sm:w-max text-xs w-20">
@@ -363,8 +356,7 @@ const QuestionPage = ({params})=>{
       <CustomModal isOpen={isContactModalOpen} onClose={closeContactModal}>
         <h2 className="text-2xl font-semibold mb-4 text-black self-center">Contacts</h2>
        
-        <p className="text-lg">B Shrinidhi : 7506211747</p>
-        <p className="text-lg"> Samir Wankhede : 7770011526</p>
+        <p className="text-lg">For any issues, please contact us at insta: @nth__live</p>
         <div className="flex justify-between items-center gap-5 mt-6">
          
         </div>
