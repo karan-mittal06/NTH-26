@@ -5,7 +5,7 @@ const InstructionsPage = () => {
     <div className="h-screen overflow-hidden relative">
       {/* Spider-Verse background */}
       <img
-        src={`spiderverse.webp`}
+        src={`how_to_play.jpg`}
         alt="Background"
         className="fixed w-full h-full -z-10 bottom-0 object-cover xl:object-fill opacity-75"
       />
