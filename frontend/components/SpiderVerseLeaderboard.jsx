@@ -130,7 +130,7 @@ export default function SpiderVerseLeaderboard() {
                     </th>
                     <th className="px-2 md:px-3 py-1.5 md:py-2 text-left text-sm md:text-base font-bold text-white uppercase tracking-wider"
                         style={{ fontFamily: 'Iceland, sans-serif' }}>
-                      Score
+                      Level
                     </th>
                   </tr>
                 </thead>
@@ -165,11 +165,9 @@ export default function SpiderVerseLeaderboard() {
                               }}>
                             {user.username}
                           </td>
-                          <td className="px-2 md:px-3 py-1.5 md:py-2 text-sm md:text-base font-bold"
+                          <td className="px-2 md:px-3 py-1.5 md:py-2 text-sm md:text-base font-bold text-white uppercase tracking-wide"
                               style={{ fontFamily: 'Iceland, sans-serif' }}>
-                            <span className="inline-block px-2 py-0.5 rounded-full bg-gradient-to-r from-red-500/30 to-purple-500/30 text-cyan-300 border border-cyan-500/50 text-xs md:text-sm">
-                              {user.curr_level}
-                            </span>
+                            {user.curr_level}
                           </td>
                         </tr>
                       );
